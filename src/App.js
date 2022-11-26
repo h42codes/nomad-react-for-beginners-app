@@ -1,43 +1,37 @@
-import { useState, useEffect } from "react";
-
-// execute a code when a component is destroyed
-
-function Hello() {
-  useEffect(() => {
-    console.log("Created!");
-    // This is a cleanup function that allos you to do something when the component is destroyed
-    return () => console.log("Destroyed"); // this is run when the component is destroyed
-  }, []); // having no dependencies means it runs only one time
-  return <h1>Hello</h1>;
-}
-
-function Hello2() {
-  // Cleanup function
-  function byFn() {
-    console.log("bye");
-  }
-  function hiFn() {
-    console.log("hi");
-    // when the component is destroyed, react will run the function returned by this function
-    return byFn;
-  }
-  useEffect(hiFn, []);
-
-  useEffect(() => {
-    console.log("HI");
-    return () => {
-      console.log("BYE");
-    };
-  }, []);
-}
-
+import { useEffect, useState } from "react";
 function App() {
-  const [showing, setShowing] = useState(false);
-  const onClick = () => setShowing((prev) => !prev);
+  const [toDo, setToDo] = useState("");
+  const [toDos, setToDos] = useState([]);
+  const onChange = (event) => setToDo(event.target.value);
+  const onSubmit = (event) => {
+    event.preventDefault();
+    if (toDo === "") {
+      return;
+    }
+    setToDo("");
+    setToDos((currentArray) => [toDo, ...currentArray]);
+  };
+  useEffect(() => {
+    console.log(toDos);
+  }, [toDos]);
   return (
     <div>
-      {showing ? <Hello /> : null}
-      <button onClick={onClick}>{showing ? "Hide" : "Show"}</button>
+      <h1>My To Dos: {toDos.length} tasks</h1>
+      <form onSubmit={onSubmit}>
+        <input
+          onChange={onChange}
+          type="text"
+          value={toDo}
+          placeholder="Write your to do..."
+        />
+        <button>Add To Do</button>
+      </form>
+      <hr />
+      <ul>
+        {toDos.map((task, index) => (
+          <li key={index}>{task}</li>
+        ))}
+      </ul>
     </div>
   );
 }
